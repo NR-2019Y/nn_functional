@@ -1,10 +1,19 @@
 from typing import Union, Tuple, List
+import numpy as np
+import cupy as cp
 
-stride_type = Union[int, Tuple[int, int], List[int]]
+size_2_t = Union[int, Tuple[int, int], List[int]]
+array_t = Union[np.ndarray, cp.ndarray]
 
 
-def get_stride(stride: stride_type) -> Tuple[int, int]:
-    if isinstance(stride, int):
-        return stride, stride
-    assert len(stride) == 2
-    return tuple(stride)
+def get_pair(x: size_2_t):
+    if isinstance(x, int):
+        return x, x
+    assert len(x) == 2
+    return tuple(x)
+
+def get_array_module(x: array_t):
+    assert isinstance(x, (np.ndarray, cp.ndarray))
+    if isinstance(x, np.ndarray):
+        return np
+    return cp
