@@ -1,0 +1,14 @@
+.idea/
+__pycache__/
+*.mp4
+*.onnx
+*.pt
+*.pth
+*.ttf
+*.engine
+*.torchscript
+*.bin
+.vscode/
+*.param
+.run/
+*.otf
