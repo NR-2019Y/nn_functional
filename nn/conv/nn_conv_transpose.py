@@ -1,12 +1,12 @@
 import numpy as np
-from nn.conv.utils import stride_type, get_stride
+from nn.conv.utils import size_2_t, get_pair
 
 
-def conv_nchw_transpose2d(img: np.ndarray, kernel: np.ndarray, stride: stride_type) -> np.ndarray:
+def conv_nchw_transpose2d(img: np.ndarray, kernel: np.ndarray, stride: size_2_t) -> np.ndarray:
     batch_size, _ic, ih, iw = img.shape
     ic, oc, kh, kw = kernel.shape
     assert _ic == ic
-    sh, sw = get_stride(stride)
+    sh, sw = get_pair(stride)
     oh = (ih - 1) * sh + kh
     ow = (iw - 1) * sw + kw
     imcol = np.zeros((batch_size, ic, oh, ow, kh, kw), dtype=img.dtype)
@@ -23,7 +23,7 @@ def _check():
     import time
     import torch
     import torch.nn.functional as F
-    def convt_torch(img: np.ndarray, kernel: np.ndarray, stride: stride_type) -> np.ndarray:
+    def convt_torch(img: np.ndarray, kernel: np.ndarray, stride: size_2_t) -> np.ndarray:
         x = torch.from_numpy(img)
         w = torch.from_numpy(kernel)
         r = F.conv_transpose2d(x, w, bias=None, stride=stride)
