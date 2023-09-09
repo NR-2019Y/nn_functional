@@ -4,7 +4,7 @@ from nn.conv.utils import array_t, size_2_t, get_array_module, get_pair
 def maxpool2d_nchw(img: array_t, ksize: size_2_t, stride: size_2_t = 1, dilation: size_2_t = 1) -> array_t:
     xp = get_array_module(img)
     batch_size, ic, ih, iw = img.shape
-    kh, kw = ksize
+    kh, kw = get_pair(ksize)
     sh, sw = get_pair(stride)
     dh, dw = get_pair(dilation)
     dkh = kh + (kh - 1) * (dh - 1)
