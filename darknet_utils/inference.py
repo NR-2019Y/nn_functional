@@ -21,7 +21,7 @@ def main():
     IOU_THRESHOLD = 0.4
     MAX_DETS = 100
 
-    PREFIX = 'yolov4'
+    PREFIX = 'yolov3'
     cfg_file = f'/home/a/PROJ/AlexeyAB/darknet/cfg/{PREFIX}.cfg'
     weight_file = f'/home/a/PROJ/AlexeyAB/darknet/weights/{PREFIX}.weights'
     yolo = YOLO(cfg_file, weight_file, input_height=None, input_width=None)

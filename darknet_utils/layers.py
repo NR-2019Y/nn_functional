@@ -80,6 +80,7 @@ class Convolutional(DarknetLayer):
         # print("shapes", self.shapes)
 
     def __call__(self, x: xp.ndarray):
+        # print(self.weight.shape, self.bias.shape)
         if self.ph or self.pw:
             x = xp.pad(x, [[0, 0], [0, 0], [self.ph, self.ph], [self.pw, self.pw]])
         x = conv2d_nchw_v1(x, self.weight, self.stride) + self.bias[None, :, None, None]
@@ -155,7 +156,10 @@ class Route(DarknetLayer):
         assert isinstance(x_list, (list, tuple))
         if len(x_list) == 1:
             return x_list[0]
-        return xp.concatenate(x_list, axis=1)
+        # print([e.shape for e in x_list])
+        xout = xp.concatenate(x_list, axis=1)
+        # print("route", xout.shape)
+        return xout
 
 
 class ShortCut(DarknetLayer):
@@ -172,6 +176,17 @@ class ShortCut(DarknetLayer):
         if self.act is None:
             return x
         return self.act(x)
+
+
+# https://github.com/WongKinYiu/PyTorch_YOLOv4/blob/master/utils/layers.py
+class Reorg(DarknetLayer):
+    def __call__(self, x: array_t):
+        return xp.concatenate((
+            x[..., 0::2, 0::2],
+            x[..., 1::2, 0::2],
+            x[..., 0::2, 1::2],
+            x[..., 1::2, 1::2]
+        ), axis=1)
 
 
 class YoloDetect(DarknetLayer):

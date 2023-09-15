@@ -26,6 +26,7 @@ def create_model(model_cfg_dic: List[dict],
     modules = OrderedDict()
     with open(weight_file, 'rb') as fp:
         xp.fromfile(fp, dtype=xp.int32, count=5)
+        # xp.fromfile(fp, dtype=xp.int32, count=4)
 
         cfg_dic_iter = iter(model_cfg_dic)
         init_cfg = next(cfg_dic_iter)
@@ -69,15 +70,18 @@ def create_model(model_cfg_dic: List[dict],
                 save |= set(iidxs)
                 iidxs.append(i - 1)
                 input_indices[i] = iidxs
-            elif block_type == 'yolo':
-                mask = curr_cfg['mask']
+            elif block_type == 'reorg':
+                modules[f'm{i}_reorg'] = layers.Reorg()
+                prev_ch *= 4
+            elif block_type == 'yolo' or block_type == 'region':
+                mask = curr_cfg.get('mask', slice(None))
                 anchor = curr_cfg['anchors'][mask].tolist()
                 scale_x_y = float(curr_cfg.get('scale_x_y', 1))
                 new_coords = curr_cfg.get('new_coords', 0)
                 modules[f'm{i}_yolodetect'] = layers.YoloDetect(anchor, input_height, input_width, scale_x_y,
                                                                 new_coords)
             else:
-                raise RuntimeError('bad block type')
+                raise RuntimeError(f'bad block type: {block_type}')
 
             chs.append(prev_ch)
     return modules, save, input_indices, (input_height, input_width)
@@ -95,6 +99,7 @@ class YOLO(DarknetLayer):
         saved_array: Dict[int, xp.ndarray] = dict()
         yolo_results: List[xp.ndarray] = []
         for i, module in enumerate(self._modules.values()):
+            # print(module.__class__.__name__, x.shape)
             if i not in self.input_indices:
                 x = module(x)
             else:
